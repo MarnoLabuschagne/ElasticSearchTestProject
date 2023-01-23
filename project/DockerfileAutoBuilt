@@ -1,0 +1,33 @@
+#See https://aka.ms/customizecontainer to learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging.
+
+#Depending on the operating system of the host machines(s) that will build or run the containers, the image specified in the FROM statement may need to be changed.
+#For more information, please see https://aka.ms/containercompat
+
+
+#'base' phase : use microsoft runtime image
+FROM mcr.microsoft.com/dotnet/runtime:6.0 AS base
+#creates app file
+WORKDIR /app
+
+#'build' phase : use microsft sdk image
+FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
+#create source folder
+WORKDIR /src
+#copy from project->project.scproj into project->
+COPY ["project/project.csproj", "project/"]
+#from root restore the thing at project->project.csproj
+RUN dotnet restore "project/project.csproj"
+#copy all to everywhere
+COPY . .
+#create project folder in source folder
+WORKDIR "/src/project"
+#from new project folder build project.csproj and release into new build folder in app ????????
+RUN dotnet build "project.csproj" -c Release -o /app/build
+
+FROM build AS publish
+RUN dotnet publish "project.csproj" -c Release -o /app/publish /p:UseAppHost=false
+
+FROM base AS final
+WORKDIR /app
+COPY --from=publish /app/publish .
+ENTRYPOINT ["dotnet", "project.dll"]
