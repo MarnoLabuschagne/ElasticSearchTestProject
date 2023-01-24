@@ -16,6 +16,7 @@ If bootstrap error when trying to run:
 
     
 To make sure it works:
+
 #1  docker cp es01:/usr/share/elasticsearch/config/certs/http_ca.crt .
 
     if needed: Remove-item alias:curl
