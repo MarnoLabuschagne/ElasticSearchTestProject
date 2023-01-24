@@ -6,7 +6,7 @@ $3  docker run --name es01 --net elastic -p 9200:9200 -it docker.elastic.co/elas
 	save the password, http certificate, and the enrollment token
 
 
-# If bootstrap error when trying to run:
+## If bootstrap error when trying to run:
 
 $1 wsl -d docker-desktop
 
