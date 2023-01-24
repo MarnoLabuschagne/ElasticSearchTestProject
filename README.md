@@ -5,9 +5,13 @@
 #3  docker run --name es01 --net elastic -p 9200:9200 -it docker.elastic.co/elasticsearch elasticsearch:8.6.0
 	save the password, http certificate, and the enrollment token
 
+
 If bootstrap error when trying to run:
+
 wsl -d docker-desktop
+
 sysctl -w vm.max_map_count=262144
+
 exit
 
     
