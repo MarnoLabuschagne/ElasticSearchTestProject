@@ -8,18 +8,19 @@ namespace project.src
     {
         static void Main(string[] args)
         {
-            Credentials cred = new("elastic", "18G62vOs=GJwv_EjT0ez", "966c64268e1ce0e971303ed7bf1caacbe2ef9a9fe4ed61b83874fc2802a28a0b");
+            Credentials cred = new("elastic", "vUoKXj9F_6uja0g-Mw4p", "81a9b2f168e8ca07ccff70fb90ec1630478635841286dc2c067a147724f7e351");
             var node = new Uri("https://localhost:9200");
             var settings = new ConnectionSettings(node)
-                .DefaultIndex("Songs")
+                .DefaultIndex("songs")
                 .CertificateFingerprint(cred.fingerprint)
                 .BasicAuthentication(cred.username, cred.password)
                 .EnableDebugMode();
 
             var client = new ElasticClient(settings);
+            Console.WriteLine(client.Ping());
 
             Song s1 = new("Rule #4", "Fish in a Birdcage", "", new string[] { "Lyrics", "Sound", "Vibe" });
-            Song s2 = new("Prairies", "BoyWithUke", "", new string[] { "Lyrics", "Duette", "Love" });
+            Song s2 = new("Prairies", "BoyWithUke", "", new string[] { "Lyrics", "Duette"});
             Song s3 = new("Everything Black", "Unlike Pluto", "", new string[] { "Sound", "Vibes" });
 
             Console.WriteLine(s1.ToString());
@@ -31,34 +32,53 @@ namespace project.src
 
             var createIndexResponse = client.Indices.Create("myindex", c => c
                 .Map<Song>(m => m.AutoMap()));
+            Console.WriteLine("Index created: " + createIndexResponse.IsValid); 
+            //Console.WriteLine("\n" + createIndexResponse.DebugInformation.ToString());
 
-            var indexResponse = client.IndexDocument(s1);
-            Console.WriteLine(indexResponse.IsValid);
-            indexResponse = client.IndexDocument(s2);
-            Console.WriteLine(indexResponse.Id);
-            indexResponse = client.IndexDocument(s3);
-            Console.WriteLine(indexResponse.Id);
+
+            var indexResponse = client.IndexDocument<Song>(s1);
+            Console.WriteLine("song 1 added: " + indexResponse.IsValid);
+            indexResponse = client.IndexDocument<Song>(s2);
+            Console.WriteLine("song 2 added: " + indexResponse.IsValid);
+            indexResponse = client.IndexDocument<Song>(s3);
+            Console.WriteLine("song 3 added: " + indexResponse.IsValid);
+
+            //Console.WriteLine("\n" + indexResponse.DebugInformation.ToString());
 
 
             Console.WriteLine("==========================================================\nQuerrying");
-
-            /*var searchResponse = client.Search<Person>(s => s
-                .From(0)
-                .Size(10)
-                .Query(q => q.MatchAll())
-            );*/
-
-
             var searchResponse = Search(client, "Rule #4", "name");
-            Console.WriteLine("serialized{name}: " + client.RequestResponseSerializer.SerializeToString(searchResponse.Documents));
+            if (searchResponse != null) { Console.WriteLine("serialized{name}: " + client.RequestResponseSerializer.SerializeToString(searchResponse.Documents)); }
+            else
+            {
+                Console.WriteLine("serialized{name}: Null");
+            }
             searchResponse = Search(client, "BoyWithUke", "author");
-            Console.WriteLine("serialized{author}: " + client.RequestResponseSerializer.SerializeToString(searchResponse.Documents));
+            if (searchResponse != null) { Console.WriteLine("serialized{author}: " + client.RequestResponseSerializer.SerializeToString(searchResponse.Documents)); }
+            else
+            {
+                Console.WriteLine("serialized{author}: Null");
+            }
             searchResponse = Search(client, "Lyrics", "tags");
-            Console.WriteLine("serialized{tags}: " + client.RequestResponseSerializer.SerializeToString(searchResponse.Documents));
+            if (searchResponse != null) { Console.WriteLine("serialized{tags}: " + client.RequestResponseSerializer.SerializeToString(searchResponse.Documents)); }
+            else
+            {
+                Console.WriteLine("serialized{tags}: Null");
+            }
             searchResponse = Search(client, "Rule #3", "name");
-            Console.WriteLine("serialized{name}: " + client.RequestResponseSerializer.SerializeToString(searchResponse.Documents));
+            if (searchResponse != null) { Console.WriteLine("serialized{name}: " + client.RequestResponseSerializer.SerializeToString(searchResponse.Documents)); }
+            else
+            {
+                Console.WriteLine("serialized{name}: Null");
+            }
             searchResponse = Search(client, "Rule #3", "all");
-            Console.WriteLine("serialized{all}: " + client.RequestResponseSerializer.SerializeToString(searchResponse.Documents));
+            if (searchResponse != null) { Console.WriteLine("serialized{all}: " + client.RequestResponseSerializer.SerializeToString(searchResponse.Documents)); } 
+            else
+            {
+                Console.WriteLine("serialized{all}: Null");
+            }
+
+            //Console.WriteLine("\n" + searchResponse.DebugInformation.ToString());
         }
 
         static ISearchResponse<Song>? Search(ElasticClient client, string query, string field)

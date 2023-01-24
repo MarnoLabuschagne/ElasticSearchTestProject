@@ -10,8 +10,8 @@ namespace project.src
     {
         public static int idGlobal { get; set; } = 1;
         [Number()] public int Id { get; set; }
-        [Text(Name = "name", Norms = false, Similarity = "fullName")] public string name { get; set; }
-        [Text(Name = "author", Similarity = "artist")] public string author { get; set; }
+        [Text(Name = "name", Norms = false)] public string name { get; set; }
+        [Text(Name = "author")] public string author { get; set; }
         [Description()] public string description { get; set; }
         [Category()] public ArrayList tagsList { get; set; }
 
