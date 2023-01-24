@@ -8,11 +8,11 @@
 
 If bootstrap error when trying to run:
 
-wsl -d docker-desktop
+#1 wsl -d docker-desktop
 
-sysctl -w vm.max_map_count=262144
+#2 sysctl -w vm.max_map_count=262144
 
-exit
+#3 exit
 
     
 To make sure it works:
